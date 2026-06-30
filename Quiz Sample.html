@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DevNet Quiz</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 50px; }
+    .question { font-size: 18px; margin-bottom: 15px; }
+    .options { margin-bottom: 20px; }
+    .option { display: block; margin: 5px 0; }
+    #nextBtn { padding: 10px 20px; font-size: 16px; }
+    #explanation { margin-top: 10px; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>DevNet Quiz</h1>
+<div id="quiz-container">
+    <div class="question" id="question"></div>
+    <div class="options">
+        <label class="option"><input type="radio" name="answer" value="A"> <span id="optionA"></span></label>
+        <label class="option"><input type="radio" name="answer" value="B"> <span id="optionB"></span></label>
+        <label class="option"><input type="radio" name="answer" value="C"> <span id="optionC"></span></label>
+        <label class="option"><input type="radio" name="answer" value="D"> <span id="optionD"></span></label>
+    </div>
+    <button id="nextBtn">Next</button>
+    <div id="explanation"></div>
+</div>
+
+<script>
+// ---------------- Quiz Data ----------------
+
+const questions = [
+"QUESTION GOES HERE (Choose two)",
+"QUESTION GOES HERE",
+"QUESTION GOES HERE",
+"QUESTION GOES HERE (Choose two)",
+"QUESTION GOES HERE",
+"QUESTION GOES HERE",
+"QUESTION GOES HERE (Choose two)",
+"QUESTION GOES HERE (Choose two)",
+"QUESTION GOES HERE",
+"QUESTION GOES HERE"
+];
+
+const options = [
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4",
+"OPTION 5"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4",
+"OPTION 5"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4",
+"OPTION 5"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4",
+"OPTION 5"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4"
+],
+[
+"OPTION 1",
+"OPTION 2",
+"OPTION 3",
+"OPTION 4"
+]
+];
+
+// Number of correct answers for each question
+const requiredAnswers = [2,1,1,2,1,1,2,2,1,1];
+
+// Correct answers
+const answers = [
+["B","E"],
+["C"],
+["A"],
+["C","E"],
+["D"],
+["B"],
+["A","C"],
+["B","C"],
+["A"],
+["D"]
+];
+
+const explanations = [
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+"",
+""
+];
+
+// ---------------- Quiz Logic ----------------
+
+let currentQuestion = 0;
+let score = 0;
+let answered = false;
+
+function loadQuestion(){
+
+    answered = false;
+
+    document.getElementById("question").innerText = questions[currentQuestion];
+    document.getElementById("explanation").innerText = "";
+    document.getElementById("explanation").style.color = "black";
+
+    const optionsDiv = document.querySelector(".options");
+    optionsDiv.innerHTML = "";
+
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    options[currentQuestion].forEach((option,index)=>{
+
+        const inputType =
+            requiredAnswers[currentQuestion] === 1
+            ? "radio"
+            : "checkbox";
+
+        optionsDiv.innerHTML += `
+            <label class="option">
+                <input type="${inputType}"
+                       name="answer"
+                       value="${letters[index]}"
+                       onchange="checkAnswer()">
+                ${letters[index]}. ${option}
+            </label>
+        `;
+    });
+
+}
+
+function checkAnswer(){
+
+    if(answered) return;
+
+    const selected = [...document.querySelectorAll("input[name='answer']:checked")]
+        .map(x=>x.value);
+
+    if(selected.length !== requiredAnswers[currentQuestion])
+        return;
+
+    answered = true;
+
+    document.querySelectorAll("input[name='answer']")
+        .forEach(x=>x.disabled=true);
+
+    const correct = answers[currentQuestion];
+
+    const isCorrect =
+        selected.length === correct.length &&
+        selected.every(x=>correct.includes(x));
+
+    if(isCorrect){
+
+        score++;
+
+        document.getElementById("explanation").innerText =
+            "Correct! " + explanations[currentQuestion];
+
+        document.getElementById("explanation").style.color = "green";
+
+    }else{
+
+        document.getElementById("explanation").innerText =
+            "Incorrect. " + explanations[currentQuestion];
+
+        document.getElementById("explanation").style.color = "red";
+
+    }
+
+}
+
+document.getElementById("nextBtn").addEventListener("click",()=>{
+
+    if(!answered){
+
+        alert(
+            `Please select ${requiredAnswers[currentQuestion]} answer${requiredAnswers[currentQuestion]>1?"s":""}.`
+        );
+
+        return;
+
+    }
+
+    currentQuestion++;
+
+    if(currentQuestion < questions.length){
+
+        loadQuestion();
+
+    }else{
+
+        document.getElementById("quiz-container").innerHTML = `
+            <h2>Quiz Complete!</h2>
+            <p>Your score is ${score}/${questions.length}
+            (${Math.round(score/questions.length*100)}%)</p>
+        `;
+
+    }
+
+});
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
